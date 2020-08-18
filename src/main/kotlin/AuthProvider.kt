@@ -14,7 +14,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.util.*
 
-object SheetsQuickstart {
+object AuthProvider {
     const val APPLICATION_NAME = "Google Sheets API Java Quickstart"
     val JSON_FACTORY: JsonFactory = JacksonFactory.getDefaultInstance()
     const val TOKENS_DIRECTORY_PATH = "tokens"
@@ -24,12 +24,23 @@ object SheetsQuickstart {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
 
-   // val scopes = listOf<String>list("SheetsScopes.SPREADSHEETS", "SheetsScopes.DRIVE", "SheetsScopes.DRIVE_FILE")
-  //  private val SCOPES: List<String> = Collections.singletonList(SheetsScopes.DRIVE)
+    // в оригинале было так
+    //  private val SCOPES: List<String> = Collections.singletonList(SheetsScopes.DRIVE)
+
+    // можно упростить и сделать лист обычных сингтонов
+
     private val SCOPES = listOf(
         SheetsScopes.SPREADSHEETS,
         SheetsScopes.DRIVE,
-        SheetsScopes.DRIVE_FILE)
+        SheetsScopes.DRIVE_FILE
+    )
+
+// а можно сделать лист коллекций синглтонов
+    /* private val SCOPES = listOf(
+         Collections.singletonList(SheetsScopes.SPREADSHEETS),
+         Collections.singletonList(SheetsScopes.DRIVE),
+         Collections.singletonList(SheetsScopes.DRIVE_FILE)
+         )*/
 
 
     private const val CREDENTIALS_FILE_PATH = "/credentials.json"
@@ -44,7 +55,7 @@ object SheetsQuickstart {
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential {
         // Load client secrets.
         val `in` =
-            SheetsQuickstart::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH)
+            AuthProvider::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH)
                 ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
         val clientSecrets =
             GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(`in`))
