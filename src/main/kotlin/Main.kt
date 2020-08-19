@@ -8,21 +8,51 @@ fun main(args: Array<String>) {
 
     val spreadsheetId = "1Qw8fZ142SIKHWi6kIPWDo68h8b8pr2lCc1dOUZgo0dU"
     val range = "Data"
+//    price -> 200
+//    product -> potato
+//    weight -> 100
+//
+//    1 price quality product weight color
+//            2
+//    3
+//    4
 
-//    val apiTestMachine = GoogleApiTestMachine()
+    //[price => 200, product => potato, weight => 100]
 
-//    println("1 to create, 2 to append")
-//    val inputCommand = readLine()!!.toInt()
-//    if (inputCommand == 1) apiTestMachine.readValues(spreadsheetId, range)
+    val initialColumnList = listOf("product","weight","price")
 
-    val HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport()
-    val service = Sheets.Builder(
-        HTTP_TRANSPORT,
-        AuthProvider.JSON_FACTORY,
-        AuthProvider.getCredentials(HTTP_TRANSPORT)
+    val fakeData = mapOf(
+        "price" to "200",
+        "product" to "potato",
+        "weight" to "100"
     )
-        .setApplicationName(AuthProvider.APPLICATION_NAME)
-        .build()
+
+    //List(10) { i -> "col$i" to "value$i" }.toMap()  //[(test1, col1), (test2, col2) ...]
+    val columnNamesExists = listOf("price", "quality", "product", "weight", "color", "hello")
+    // переменные выше firstColumns
+
+    val newRow = columnNamesExists.map { fakeData.getOrElse(it) { "" } }
+
+    //["price", "quality", "product", "weight", "color"] => ["200", " ", "potato", "100", " "]
+
+
+    val valueRange = ValueRange().setValues(listOf(newRow))
+    val apiTestMachine = GoogleApiTestMachine()
+
+    println("1 to create, 2 to append, 3 to read")
+    val inputCommand = readLine()!!.toInt()
+    if (inputCommand == 1) apiTestMachine.createTable(initialColumnList)
+    if (inputCommand == 2) apiTestMachine.appendValues(spreadsheetId, range, valueRange)
+    if (inputCommand == 3) apiTestMachine.readValues(spreadsheetId, range)
+
+    /*  val HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport()
+      val service = Sheets.Builder(
+          HTTP_TRANSPORT,
+          AuthProvider.JSON_FACTORY,
+          AuthProvider.getCredentials(HTTP_TRANSPORT)
+      )
+          .setApplicationName(AuthProvider.APPLICATION_NAME)
+          .build()*/
 
 
     // edit start
@@ -42,30 +72,9 @@ fun a() {
 }
 
 }*/
-//    price -> 200
-//    product -> potato
-//    weight -> 100
-//
-//    1 price quality product weight color
-//            2
-//    3
-//    4
 
-    //[price => 200, product => potato, weight => 100]
-    val fakeData = mapOf(
-        "price" to "200",
-        "product" to "potato",
-        "weight" to "100"
-    )
 
-    //List(10) { i -> "col$i" to "value$i" }.toMap()  //[(test1, col1), (test2, col2) ...]
-    val columnNamesExists = listOf("price", "quality", "product", "weight", "color", "hello")
-    // переменные выше firstColumns
-
-    val newRow = columnNamesExists.map { fakeData.getOrElse(it) { "" } }
-
-    //["price", "quality", "product", "weight", "color"] => ["200", " ", "potato", "100", " "]
-    val valueRange = ValueRange().setValues(listOf(newRow))
+   /*
     service
         .spreadsheets()
         .values()
@@ -85,6 +94,6 @@ fun a() {
             // Print columns A and E, which correspond to indices 0 and 4.
             println(row.joinToString(" "))
         }
-    }
+    } */
     // read end
 }
