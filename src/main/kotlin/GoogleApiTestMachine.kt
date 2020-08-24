@@ -51,8 +51,6 @@ class GoogleApiTestMachine() {
                 .setValueInputOption("RAW")
                 .execute()
 
-            println(updateValuesResponse.toString())
-
             val readResponseRowAddedValues = readValues(spreadsheetId, "Data!1:1")[0].map { it.toString() }
             appendValues(spreadsheetId, orderData, readResponseRowAddedValues)
         } else {
