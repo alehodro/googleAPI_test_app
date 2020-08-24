@@ -21,15 +21,15 @@ class GoogleApiTestMachine() {
         return listOf(columnsExistList.map { orderData.getOrElse(it) { "" } })
     }
 
-    private fun readValues(spreadsheetId: String, range: String): List<List<Any>> {
-        val response: ValueRange = sheetsService.spreadsheets().values()[spreadsheetId, range].execute()
+    private fun readValues(spreadsheetId: String): List<List<Any>> {
+        val response: ValueRange = sheetsService.spreadsheets().values()[spreadsheetId, "Data!1:1"].execute()
         val values: List<List<Any>> = response.getValues().orEmpty()
         if (values.isEmpty()) println("No data found.")
         return values
     }
 
     fun appendData(spreadsheetId: String, orderData: Map<String, String>) {
-        val readResponseRowValues = readValues(spreadsheetId, "Data!1:1")[0].map {
+        val readResponseRowValues = readValues(spreadsheetId)[0].map {
             it.toString()
         }
         val columnsInOrderData = orderData.keys.toList()
@@ -44,14 +44,14 @@ class GoogleApiTestMachine() {
             val range = "$startIndex:$endIndex"
             val content = ValueRange()
                 .setValues(listOf(columnsToAdd))
-            val updateValuesResponse = sheetsService
+            sheetsService
                 .spreadsheets()
                 .Values()
                 .append(spreadsheetId, range, content)
                 .setValueInputOption("RAW")
                 .execute()
 
-            val readResponseRowAddedValues = readValues(spreadsheetId, "Data!1:1")[0].map { it.toString() }
+            val readResponseRowAddedValues = readValues(spreadsheetId)[0].map { it.toString() }
             appendValues(spreadsheetId, orderData, readResponseRowAddedValues)
         } else {
             appendValues(spreadsheetId, orderData, readResponseRowValues)
