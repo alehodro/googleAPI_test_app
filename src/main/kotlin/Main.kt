@@ -1,99 +1,34 @@
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.model.ValueRange
-
-
 fun main(args: Array<String>) {
-    // Build a new authorized API client service.
-
-    val spreadsheetId = "1Qw8fZ142SIKHWi6kIPWDo68h8b8pr2lCc1dOUZgo0dU"
-    val range = "Data"
-//    price -> 200
-//    product -> potato
-//    weight -> 100
-//
-//    1 price quality product weight color
-//            2
-//    3
-//    4
-
-    //[price => 200, product => potato, weight => 100]
-
-    val initialColumnList = listOf("product","weight","price")
-
-    val fakeData = mapOf(
-        "price" to "200",
-        "product" to "potato",
-        "weight" to "100"
-    )
-
-    //List(10) { i -> "col$i" to "value$i" }.toMap()  //[(test1, col1), (test2, col2) ...]
-    val columnNamesExists = listOf("price", "quality", "product", "weight", "color", "hello")
-    // переменные выше firstColumns
-
-    val newRow = columnNamesExists.map { fakeData.getOrElse(it) { "" } }
-
-    //["price", "quality", "product", "weight", "color"] => ["200", " ", "potato", "100", " "]
-
-
-    val valueRange = ValueRange().setValues(listOf(newRow))
+    val testDataBuilder = DataBuilder()
     val apiTestMachine = GoogleApiTestMachine()
 
-    println("1 to create, 2 to append, 3 to read")
-    val inputCommand = readLine()!!.toInt()
-    if (inputCommand == 1) apiTestMachine.createTable(initialColumnList)
-    if (inputCommand == 2) apiTestMachine.appendValues(spreadsheetId, range, valueRange)
-    if (inputCommand == 3) apiTestMachine.readValues(spreadsheetId, range)
+    println("1. Press enter to create initial spreadsheet with columns and no data. This emulates creating of export")
 
-    /*  val HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport()
-      val service = Sheets.Builder(
-          HTTP_TRANSPORT,
-          AuthProvider.JSON_FACTORY,
-          AuthProvider.getCredentials(HTTP_TRANSPORT)
-      )
-          .setApplicationName(AuthProvider.APPLICATION_NAME)
-          .build()*/
+    readLine()
 
+    val spreadsheetId = apiTestMachine.createTable(testDataBuilder.initialColumnList)
 
-    // edit start
-    // получить первую строку из файла, если она пустая - записать keys если не пустая - сравнить keys
-    // с первой строкой и разницу записать в конец строки
-    // запись в конкретный столбец - берем ключ из data ищем его позицию в строке которую записали, создаем список
-    /* неведома хуйня
+    println(
+        "2. Press enter to append data to your spreadsheet." + "\n" +
+                "App reads columns row of a spreadsheet," +
+                " matches them to data export maps keys and appends data to spreadsheet"
+    )
 
-fun a() {
-    val dataS = mutableMapOf<String, String>()
-     val firstColumns = listOf("test1", "val", "foo", "bar", "test2")
-    val values = mutableListOf<String>()
-    val columns = dataS.forEach {
-        val index = firstColumns.indexOfFirst { coolumn -> coolumn == it.key }
-        values.add(index, it.value)
-    }
-}
+    readLine()
 
-}*/
+    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId1)
+    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId2)
+    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId3)
 
+    println("3. Press enter to append data with new column")
 
-   /*
-    service
-        .spreadsheets()
-        .values()
-        .append(spreadsheetId, range, valueRange)
-        .setValueInputOption("RAW")
-        .execute()
+    readLine()
 
+    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId4)
 
-    // read start
-    val response: ValueRange = service.spreadsheets().values()[spreadsheetId, range]
-        .execute()
-    val values = response.getValues()
-    if (values.isEmpty()) {
-        println("No data found.")
-    } else {
-        for (row in values) {
-            // Print columns A and E, which correspond to indices 0 and 4.
-            println(row.joinToString(" "))
-        }
-    } */
-    // read end
+    println("4. Press enter to append data with all new columns")
+
+    readLine()
+
+    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId5)
 }
