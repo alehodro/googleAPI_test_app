@@ -1,27 +1,26 @@
-import com.google.api.services.sheets.v4.model.ValueRange
 import java.util.*
 
 class DataBuilder() {
-
+    val spreadSheetTitle = "GoogleApi test spreadsheet"
     val initialColumnList = listOf("product", "weight", "price", "volume", "quantity")
 
-    val fakeDataReceived1 = mapOf(
+    private val fakeDataReceived1 = mapOf(
         "price" to "200",
         "product" to "potato",
         "weight" to "100"
     )
-    val fakeDataReceived2 = mapOf(
+    private val fakeDataReceived2 = mapOf(
         "price" to "400",
         "product" to "apple juice",
         "volume" to "5"
     )
-    val fakeDataReceived3 = mapOf(
+    private val fakeDataReceived3 = mapOf(
         "price" to "30",
         "product" to "garlic",
         "quantity" to "10"
     )
 
-    val fakeDataReceived4 =
+    private val fakeDataReceived4 =
         mapOf(
             "price" to "50",
             "product" to "apple",
@@ -29,19 +28,16 @@ class DataBuilder() {
             "color" to "green"
         )
 
-    val fakeDataReceived5 =
+    private val fakeDataReceived5 =
         mapOf(
-            "Саня" to "Четкий",
-            "Ваня" to "Стример",
-            "Володя" to "Клевый",
-            "Дядя" to "Вася"
+            "Column1" to "DataColumn1",
+            "Column2" to "DataColumn2",
+            "Column3" to "DataColumn3",
+            "Column4" to "DataColumn4"
         )
 
-    fun addOrderIdToDataReceived(dataReceived: Map<String, String>): Map<String, String> {
-        val orderId = UUID.randomUUID().toString()
-        val mutableMap = dataReceived.toMutableMap()
-        mutableMap.put("orderId", orderId)
-        return mutableMap
+    private fun addOrderIdToDataReceived(dataReceived: Map<String, String>): Map<String, String> {
+        return dataReceived + ("orderId" to UUID.randomUUID().toString())
     }
 
     val fakeDataWithOrderId1 = addOrderIdToDataReceived(fakeDataReceived1)

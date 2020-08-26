@@ -23,7 +23,7 @@ class GoogleApiTestMachine() {
 
     private fun readValues(spreadsheetId: String): List<List<Any>> {
         val response: ValueRange = sheetsService.spreadsheets().values()[spreadsheetId, "Data!1:1"].execute()
-        val values: List<List<Any>> = response.getValues().orEmpty()
+        val values = response.getValues().orEmpty()
         if (values.isEmpty()) println("No data found.")
         return values
     }
@@ -72,7 +72,7 @@ class GoogleApiTestMachine() {
         println("Data successfully appended\n")
     }
 
-    fun createTable(columnsList: List<String>): String {
+    fun createTable(columnsList: List<String>, spreadsheetTitle: String): String {
 
         fun addOrderIdColumn(initialColumnList: List<String>): List<String> {
             val toMutableList = initialColumnList.toMutableList()
@@ -81,8 +81,15 @@ class GoogleApiTestMachine() {
         }
 
         fun createCellDataLists(columnsList: List<String>): List<List<CellData>> {
-            return columnsList.map<String, List<CellData>> {
-                listOf(CellData().setUserEnteredValue(ExtendedValue().setStringValue(it)))
+            return columnsList.map {
+                listOf(
+                    CellData().setUserEnteredValue(ExtendedValue().setStringValue(it))
+                        .setUserEnteredFormat(CellFormat()
+                            .setWrapStrategy("WRAP")
+                            .setHorizontalAlignment("LEFT")
+                            .setTextFormat(TextFormat().setBold(true))
+                    )
+                )
             }
         }
 
@@ -91,11 +98,11 @@ class GoogleApiTestMachine() {
         }
 
         fun createDataGridList(rawDataLists: List<List<RowData>>): List<GridData> {
-            return rawDataLists.mapIndexed { i, it ->
+            return rawDataLists.mapIndexed { i, rowData ->
                 GridData()
                     .setStartColumn(i)
                     .setStartRow(0)
-                    .setRowData(it)
+                    .setRowData(rowData)
             }
         }
 
@@ -111,9 +118,9 @@ class GoogleApiTestMachine() {
                     .setSheetId(0)
                     .setSheetType("GRID")
             )
-        val newSheets = listOf<Sheet>(newSheet)
+        val newSheets = listOf(newSheet)
         val spreadSheetProps = SpreadsheetProperties()
-            .setTitle("testMelon")
+            .setTitle(spreadsheetTitle)
             .setLocale("ru_RU")
         val newSpreadsheet = Spreadsheet()
             .setSheets(newSheets)

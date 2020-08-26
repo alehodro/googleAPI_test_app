@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
 
     readLine()
 
-    val spreadsheetId = apiTestMachine.createTable(testDataBuilder.initialColumnList)
+    val spreadsheetId = apiTestMachine.createTable(testDataBuilder.initialColumnList, testDataBuilder.spreadSheetTitle)
 
     println(
         "2. Press enter to append data to your spreadsheet." + "\n" +
