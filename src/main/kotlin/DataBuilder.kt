@@ -2,9 +2,9 @@ import java.util.*
 
 class DataBuilder() {
     val spreadSheetTitle = "GoogleApi test spreadsheet"
-    val initialColumnList = listOf("product", "weight", "price", "volume", "quantity")
+    val spreadSheetIsNotExist = SpreadSheet(null,spreadSheetTitle)
 
-    private val fakeDataReceived1 = mapOf(
+    val fakeDataReceived1 = mapOf(
         "price" to "200",
         "product" to "potato",
         "weight" to "100"
@@ -36,13 +36,4 @@ class DataBuilder() {
             "Column4" to "DataColumn4"
         )
 
-    private fun addOrderIdToDataReceived(dataReceived: Map<String, String>): Map<String, String> {
-        return dataReceived + ("orderId" to UUID.randomUUID().toString())
-    }
-
-    val fakeDataWithOrderId1 = addOrderIdToDataReceived(fakeDataReceived1)
-    val fakeDataWithOrderId2 = addOrderIdToDataReceived(fakeDataReceived2)
-    val fakeDataWithOrderId3 = addOrderIdToDataReceived(fakeDataReceived3)
-    val fakeDataWithOrderId4 = addOrderIdToDataReceived(fakeDataReceived4)
-    val fakeDataWithOrderId5 = addOrderIdToDataReceived(fakeDataReceived5)
 }

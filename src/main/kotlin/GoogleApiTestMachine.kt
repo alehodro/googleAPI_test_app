@@ -28,41 +28,57 @@ class GoogleApiTestMachine() {
         return values
     }
 
-    fun appendData(spreadsheetId: String, orderData: Map<String, String>) {
-        val readResponseRowValues = readValues(spreadsheetId)[0].map {
-            it.toString()
-        }
-        val columnsInOrderData = orderData.keys.toList()
-        val columnsToAdd = columnsInOrderData.filterNot { readResponseRowValues.contains(it) }
-        if (columnsToAdd.firstOrNull() != null) {
-            val startIndex = Chars.checkedCast(readResponseRowValues.size.toLong() + 97)
-            val endIndex = if (columnsToAdd.size == 1) {
-                startIndex
-            } else {
-                Chars.checkedCast(readResponseRowValues.size.toLong() + columnsToAdd.size.toLong() + 97)
-            }
-            val range = "$startIndex:$endIndex"
-            val content = ValueRange()
-                .setValues(listOf(columnsToAdd))
-            sheetsService
-                .spreadsheets()
-                .Values()
-                .append(spreadsheetId, range, content)
-                .setValueInputOption("RAW")
-                .execute()
+    fun appendData(spreadsheet: SpreadSheet, orderData: Map<String, String>) {
+        if (spreadsheet.spreadSheetId.isNullOrEmpty()&&!spreadsheet.spreadSheetTitle.isNullOrEmpty()){
+            val spreadsheetId = createTable(orderData.keys.toList(),spreadsheet.spreadSheetTitle)
+            val range = "Data"
+            val rowsValues = listOf(listOf(orderData.values))
+            val valueRange = ValueRange().setValues(rowsValues)
 
-            val readResponseRowAddedValues = readValues(spreadsheetId)[0].map { it.toString() }
-            appendValues(spreadsheetId, orderData, readResponseRowAddedValues)
+            appendValues(spreadsheetId,range,valueRange)
+        } else if (!spreadsheet.spreadSheetId.isNullOrEmpty()&& readValues(spreadsheet.spreadSheetId)[0].isEmpty()){
+            val columnsRowToAdd = listOf(listOf(orderData.keys))
+            val range = "Data"
+            val valueRange = ValueRange().setValues(columnsRowToAdd)
+            appendValues(spreadsheet.spreadSheetId,range,valueRange)
         } else {
-            appendValues(spreadsheetId, orderData, readResponseRowValues)
+            val readResponseRowValues = readValues(spreadsheet.spreadSheetId!!)[0].map {
+                it.toString()
+            }
+            val columnsInOrderData = orderData.keys.toList()
+            val columnsToAdd = columnsInOrderData.filterNot { readResponseRowValues.contains(it) }
+            if (columnsToAdd.firstOrNull() != null) {
+                val startIndex = Chars.checkedCast(readResponseRowValues.size.toLong() + 97)
+                val endIndex = if (columnsToAdd.size == 1) {
+                    startIndex
+                } else {
+                    Chars.checkedCast(readResponseRowValues.size.toLong() + columnsToAdd.size.toLong() + 97)
+                }
+                val rangeColumns = "$startIndex:$endIndex"
+                val content = ValueRange()
+                    .setValues(listOf(columnsToAdd))
+                sheetsService
+                    .spreadsheets()
+                    .Values()
+                    .append(spreadsheet.spreadSheetId, rangeColumns, content)
+                    .setValueInputOption("RAW")
+                    .execute()
+
+                val readResponseRowAddedValues = readValues(spreadsheet.spreadSheetId)[0].map { it.toString() }
+                val rowsToAdd = createRowsToAdd(orderData, readResponseRowAddedValues)
+                val valueRange = ValueRange().setValues(rowsToAdd)
+                val range = "Data"
+                appendValues(spreadsheet.spreadSheetId, range, valueRange)
+            } else {
+                val rowsToAdd = createRowsToAdd(orderData, readResponseRowValues)
+                val valueRange = ValueRange().setValues(rowsToAdd)
+                val range = "Data"
+                appendValues(spreadsheet.spreadSheetId, range, valueRange)
+            }
         }
     }
 
-    private fun appendValues(spreadsheetId: String, orderData: Map<String, String>, rowsList: List<String>) {
-        val rowsToAdd = createRowsToAdd(orderData, rowsList)
-        val valueRange = ValueRange().setValues(rowsToAdd)
-        val range = "Data"
-
+    private fun appendValues(spreadsheetId: String, range:String , valueRange:ValueRange) {
         sheetsService
             .spreadsheets()
             .values()
@@ -72,23 +88,18 @@ class GoogleApiTestMachine() {
         println("Data successfully appended\n")
     }
 
-    fun createTable(columnsList: List<String>, spreadsheetTitle: String): String {
-
-        fun addOrderIdColumn(initialColumnList: List<String>): List<String> {
-            val toMutableList = initialColumnList.toMutableList()
-            toMutableList.add(0, "orderId")
-            return toMutableList.toList()
-        }
+    private fun createTable(columnsList: List<String>, spreadsheetTitle: String): String {
 
         fun createCellDataLists(columnsList: List<String>): List<List<CellData>> {
             return columnsList.map {
                 listOf(
                     CellData().setUserEnteredValue(ExtendedValue().setStringValue(it))
-                        .setUserEnteredFormat(CellFormat()
-                            .setWrapStrategy("WRAP")
-                            .setHorizontalAlignment("LEFT")
-                            .setTextFormat(TextFormat().setBold(true))
-                    )
+                        .setUserEnteredFormat(
+                            CellFormat()
+                                .setWrapStrategy("WRAP")
+                                .setHorizontalAlignment("LEFT")
+                                .setTextFormat(TextFormat().setBold(true))
+                        )
                 )
             }
         }
@@ -106,8 +117,7 @@ class GoogleApiTestMachine() {
             }
         }
 
-        val columnListWithOrderId = addOrderIdColumn(columnsList)
-        val cellDataLists = createCellDataLists(columnListWithOrderId)
+        val cellDataLists = createCellDataLists(columnsList)
         val rawDataLists = createRawDataLists(cellDataLists)
         val gridDataList = createDataGridList(rawDataLists)
         val newSheet = Sheet()

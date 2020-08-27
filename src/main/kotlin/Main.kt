@@ -2,13 +2,13 @@ fun main(args: Array<String>) {
     val testDataBuilder = DataBuilder()
     val apiTestMachine = GoogleApiTestMachine()
 
-    println("1. Press enter to create initial spreadsheet with columns and no data. This emulates creating of export")
+    println("1. Press enter to create initial spreadsheet and append data")
 
     readLine()
 
-    val spreadsheetId = apiTestMachine.createTable(testDataBuilder.initialColumnList, testDataBuilder.spreadSheetTitle)
+  apiTestMachine.appendData(testDataBuilder.spreadSheetIsNotExist,testDataBuilder.fakeDataReceived1)
 
-    println(
+  /*  println(
         "2. Press enter to append data to your spreadsheet." + "\n" +
                 "App reads columns row of a spreadsheet," +
                 " matches them to data export maps keys and appends data to spreadsheet"
@@ -30,5 +30,5 @@ fun main(args: Array<String>) {
 
     readLine()
 
-    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId5)
+    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId5)*/
 }
