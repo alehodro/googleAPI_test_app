@@ -29,18 +29,20 @@ class GoogleApiTestMachine() {
     }
 
     fun appendData(spreadsheet: SpreadSheet, orderData: Map<String, String>) {
-        if (spreadsheet.spreadSheetId.isNullOrEmpty()&&!spreadsheet.spreadSheetTitle.isNullOrEmpty()){
-            val spreadsheetId = createTable(orderData.keys.toList(),spreadsheet.spreadSheetTitle)
+        if (spreadsheet.spreadSheetId.isNullOrEmpty() && !spreadsheet.spreadSheetTitle.isNullOrEmpty()) {
+            val spreadsheetId = createTable(orderData.keys.toList(), spreadsheet.spreadSheetTitle)
             val range = "Data"
-            val rowsValues = listOf(listOf(orderData.values))
+            val rowsValues = listOf(orderData.values.toList())
             val valueRange = ValueRange().setValues(rowsValues)
-
-            appendValues(spreadsheetId,range,valueRange)
-        } else if (!spreadsheet.spreadSheetId.isNullOrEmpty()&& readValues(spreadsheet.spreadSheetId)[0].isEmpty()){
-            val columnsRowToAdd = listOf(listOf(orderData.keys))
+            appendValues(spreadsheetId, range, valueRange)
+        } else if (!spreadsheet.spreadSheetId.isNullOrEmpty() && readValues(spreadsheet.spreadSheetId).isEmpty()) {
+            val columnsRowToAdd = listOf(orderData.keys.toList())
+            val dataRowsToAdd = listOf(orderData.values.toList())
             val range = "Data"
-            val valueRange = ValueRange().setValues(columnsRowToAdd)
-            appendValues(spreadsheet.spreadSheetId,range,valueRange)
+            val valueRangeColumns = ValueRange().setValues(columnsRowToAdd)
+            val valueRangeRows = ValueRange().setValues(dataRowsToAdd)
+            appendValues(spreadsheet.spreadSheetId, range, valueRangeColumns)
+            appendValues(spreadsheet.spreadSheetId, range, valueRangeRows)
         } else {
             val readResponseRowValues = readValues(spreadsheet.spreadSheetId!!)[0].map {
                 it.toString()
@@ -78,7 +80,7 @@ class GoogleApiTestMachine() {
         }
     }
 
-    private fun appendValues(spreadsheetId: String, range:String , valueRange:ValueRange) {
+    private fun appendValues(spreadsheetId: String, range: String, valueRange: ValueRange) {
         sheetsService
             .spreadsheets()
             .values()
@@ -91,17 +93,7 @@ class GoogleApiTestMachine() {
     private fun createTable(columnsList: List<String>, spreadsheetTitle: String): String {
 
         fun createCellDataLists(columnsList: List<String>): List<List<CellData>> {
-            return columnsList.map {
-                listOf(
-                    CellData().setUserEnteredValue(ExtendedValue().setStringValue(it))
-                        .setUserEnteredFormat(
-                            CellFormat()
-                                .setWrapStrategy("WRAP")
-                                .setHorizontalAlignment("LEFT")
-                                .setTextFormat(TextFormat().setBold(true))
-                        )
-                )
-            }
+            return columnsList.map { listOf(CellData().setUserEnteredValue(ExtendedValue().setStringValue(it))) }
         }
 
         fun createRawDataLists(cellDataLists: List<List<CellData>>): List<List<RowData>> {

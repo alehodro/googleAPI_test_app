@@ -8,27 +8,20 @@ fun main(args: Array<String>) {
 
   apiTestMachine.appendData(testDataBuilder.spreadSheetIsNotExist,testDataBuilder.fakeDataReceived1)
 
-  /*  println(
-        "2. Press enter to append data to your spreadsheet." + "\n" +
-                "App reads columns row of a spreadsheet," +
-                " matches them to data export maps keys and appends data to spreadsheet"
+    println(
+        "2. Create a spreadsheet and name list \"Data\" copy and paste it's id to command line and" + "\n" +"press " +
+                "enter or copy id of the spreadsheet created at first step"
     )
 
-    readLine()
+    val spreadsheetId = SpreadSheet(readLine(),null)
 
-    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId1)
-    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId2)
-    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId3)
+    apiTestMachine.appendData(spreadsheetId,testDataBuilder.fakeDataReceived2)
 
-    println("3. Press enter to append data with new column")
+    println("3. Now press enter to append data with new columns to your second table you created")
 
     readLine()
 
-    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId4)
-
-    println("4. Press enter to append data with all new columns")
-
-    readLine()
-
-    apiTestMachine.appendData(spreadsheetId, testDataBuilder.fakeDataWithOrderId5)*/
+    apiTestMachine.appendData(SpreadSheet(spreadsheetId.spreadSheetId,null),testDataBuilder.fakeDataReceived3)
+    apiTestMachine.appendData(SpreadSheet(spreadsheetId.spreadSheetId,null),testDataBuilder.fakeDataReceived4)
+    apiTestMachine.appendData(SpreadSheet(spreadsheetId.spreadSheetId,null),testDataBuilder.fakeDataReceived5)
 }
