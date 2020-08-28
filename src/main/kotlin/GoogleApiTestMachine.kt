@@ -1,7 +1,6 @@
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.model.*
-import com.google.common.primitives.Chars
 
 
 class GoogleApiTestMachine() {
@@ -49,38 +48,39 @@ class GoogleApiTestMachine() {
             }
             val columnsInOrderData = orderData.keys.toList()
             val columnsToAdd = columnsInOrderData.filterNot { readResponseRowValues.contains(it) }
-            if (columnsToAdd.firstOrNull() != null) {
-                val startIndex = Chars.checkedCast(readResponseRowValues.size.toLong() + 97)
-                val endIndex = if (columnsToAdd.size == 1) {
-                    startIndex
-                } else {
-                    Chars.checkedCast(readResponseRowValues.size.toLong() + columnsToAdd.size.toLong() + 97)
-                }
-                val rangeColumns = "$startIndex:$endIndex"
-                val content = ValueRange()
-                    .setValues(listOf(columnsToAdd))
-                sheetsService
-                    .spreadsheets()
-                    .Values()
-                    .append(spreadsheet.spreadSheetId, rangeColumns, content)
-                    .setValueInputOption("RAW")
-                    .execute()
-
-                val readResponseRowAddedValues = readValues(spreadsheet.spreadSheetId)[0].map { it.toString() }
-                val rowsToAdd = createRowsToAdd(orderData, readResponseRowAddedValues)
-                val valueRange = ValueRange().setValues(rowsToAdd)
-                val range = "Data"
-                appendValues(spreadsheet.spreadSheetId, range, valueRange)
-            } else {
-                val rowsToAdd = createRowsToAdd(orderData, readResponseRowValues)
-                val valueRange = ValueRange().setValues(rowsToAdd)
-                val range = "Data"
-                appendValues(spreadsheet.spreadSheetId, range, valueRange)
-            }
+            val responseRowValues = addColumns(columnsToAdd, readResponseRowValues, spreadsheet.spreadSheetId)
+            val rowsToAdd = createRowsToAdd(orderData, responseRowValues)
+            val valueRange = ValueRange().setValues(rowsToAdd)
+            val range = "Data"
+            appendValues(spreadsheet.spreadSheetId, range, valueRange)
         }
     }
 
-    private fun appendValues(spreadsheetId: String, range: String, valueRange: ValueRange) {
+    private fun addColumns(
+        columnsToAdd: List<String>,
+        currentColumns: List<String>,
+        spreadSheetId: String
+    ): List<String> {
+        return if (columnsToAdd.isNotEmpty()) {
+            val startIndex = currentColumns.size + 97
+            val endIndex = columnsToAdd.size + startIndex - 1
+            val rangeColumns = "${startIndex.toChar()}:${endIndex.toChar()}"
+            val content = ValueRange()
+                .setValues(listOf(columnsToAdd))
+            sheetsService
+                .spreadsheets()
+                .Values()
+                .append(spreadSheetId, rangeColumns, content)
+                .setValueInputOption("RAW")
+                .execute()
+
+            readValues(spreadSheetId)[0].map { it.toString() }
+        } else {
+            currentColumns
+        }
+    }
+
+    fun appendValues(spreadsheetId: String, range: String, valueRange: ValueRange) {
         sheetsService
             .spreadsheets()
             .values()
