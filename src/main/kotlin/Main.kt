@@ -6,14 +6,14 @@ fun main(args: Array<String>) {
 
     readLine()
 
-  apiTestMachine.appendData(testDataBuilder.spreadSheetIsNotExist,testDataBuilder.fakeDataReceived1)
+  apiTestMachine.appendData(null,testDataBuilder.fakeDataReceived1)
 
     println(
         "2. Create a spreadsheet and name list \"Data\" copy and paste it's id to command line and" + "\n" +"press " +
                 "enter or copy id of the spreadsheet created at first step"
     )
 
-    val spreadsheetId = SpreadSheet(readLine(),null)
+    val spreadsheetId = readLine()
 
     apiTestMachine.appendData(spreadsheetId,testDataBuilder.fakeDataReceived2)
 
@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
 
     readLine()
 
-    apiTestMachine.appendData(SpreadSheet(spreadsheetId.spreadSheetId,null),testDataBuilder.fakeDataReceived3)
-    apiTestMachine.appendData(SpreadSheet(spreadsheetId.spreadSheetId,null),testDataBuilder.fakeDataReceived4)
-    apiTestMachine.appendData(SpreadSheet(spreadsheetId.spreadSheetId,null),testDataBuilder.fakeDataReceived5)
+    apiTestMachine.appendData(spreadsheetId,testDataBuilder.fakeDataReceived3)
+    apiTestMachine.appendData(spreadsheetId,testDataBuilder.fakeDataReceived4)
+    apiTestMachine.appendData(spreadsheetId,testDataBuilder.fakeDataReceived5)
 }

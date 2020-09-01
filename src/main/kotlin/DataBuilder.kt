@@ -1,9 +1,6 @@
 import java.util.*
 
 class DataBuilder() {
-    val spreadSheetTitle = "GoogleApi test spreadsheet"
-    val spreadSheetIsNotExist = SpreadSheet(null, spreadSheetTitle)
-
     val fakeDataReceived1 = mapOf(
         "price" to "200",
         "product" to "potato",
