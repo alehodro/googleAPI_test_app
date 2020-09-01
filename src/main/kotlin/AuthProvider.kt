@@ -4,7 +4,6 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.sheets.v4.SheetsScopes
@@ -15,7 +14,7 @@ import java.io.InputStreamReader
 
 object AuthProvider {
     const val APPLICATION_NAME = "Google Sheets API Java Quickstart"
-    val JSON_FACTORY: JsonFactory = JacksonFactory.getDefaultInstance()
+    val JSON_FACTORY = JacksonFactory.getDefaultInstance()
     const val TOKENS_DIRECTORY_PATH = "tokens"
 
     private val SCOPES = listOf(
@@ -28,11 +27,11 @@ object AuthProvider {
 
     @Throws(IOException::class)
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential {
-        val `in` =
+        val input =
             AuthProvider::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH)
                 ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
         val clientSecrets =
-            GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(`in`))
+            GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(input))
         val flow = GoogleAuthorizationCodeFlow.Builder(
             HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES
         )
