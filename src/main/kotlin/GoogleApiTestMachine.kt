@@ -34,9 +34,13 @@ class GoogleApiTestMachine() {
     }
 
     fun appendData(spreadsheetId: String?, orderData: Map<String, String>) {
-        val valuesRead = if (!spreadsheetId.isNullOrEmpty()) readValues(spreadsheetId) else emptyList()
+        val valuesRead = if (spreadsheetId != null) {
+            readValues(spreadsheetId)
+        } else {
+            emptyList()
+        }
         val columnsInOrderData = orderData.keys.toList()
-        if (spreadsheetId.isNullOrEmpty() || valuesRead.isEmpty()) {
+        if (spreadsheetId == null || valuesRead.isEmpty()) {
             val spreadsheetIdToAppend = spreadsheetId ?: createTable(createTitle())
             val rowsValuesColumns = listOf(columnsInOrderData)
             val rowsValuesData = listOf(orderData.values.toList())
@@ -74,7 +78,7 @@ class GoogleApiTestMachine() {
         return currentColumns + columnsToAdd
     }
 
-    fun appendValues(spreadsheetId: String, rowsValues: List<List<String>>) {
+    private fun appendValues(spreadsheetId: String, rowsValues: List<List<String>>) {
         val valueRange = ValueRange().setValues(rowsValues)
         sheetsService
             .spreadsheets()
@@ -86,30 +90,7 @@ class GoogleApiTestMachine() {
     }
 
     private fun createTable(spreadsheetTitle: String): String {
-        // private fun createTable(columnsList: List<String>, spreadsheetTitle: String): String {
-
-        /*  fun createCellDataLists(columnsList: List<String>): List<List<CellData>> {
-              return columnsList.map { listOf(CellData().setUserEnteredValue(ExtendedValue().setStringValue(it))) }
-          }
-
-          fun createRawDataLists(cellDataLists: List<List<CellData>>): List<List<RowData>> {
-              return cellDataLists.map { listOf(RowData().setValues(it)) }
-          }
-
-          fun createDataGridList(rawDataLists: List<List<RowData>>): List<GridData> {
-              return rawDataLists.mapIndexed { i, rowData ->
-                  GridData()
-                      .setStartColumn(i)
-                      .setStartRow(0)
-                      .setRowData(rowData)
-              }
-          }
-
-          val cellDataLists = createCellDataLists(columnsList)
-          val rawDataLists = createRawDataLists(cellDataLists)
-          val gridDataList = createDataGridList(rawDataLists)*/
         val newSheet = Sheet()
-            //  .setData(gridDataList)
             .setProperties(
                 SheetProperties()
                     .setTitle("Data")
