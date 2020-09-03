@@ -1,4 +1,3 @@
-
 class DataBuilder() {
     val fakeDataReceived1 = mapOf(
         "price" to "200",

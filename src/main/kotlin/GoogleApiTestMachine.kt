@@ -33,12 +33,31 @@ class GoogleApiTestMachine() {
         return "Google Api Test Spreadsheet"
     }
 
+    private fun fillEmptyColumns(spreadsheetId: String, columnsExistList: List<String>) {
+        val rowListFilled = columnsExistList.map {
+            if (it.isBlank()) {
+                "empty"
+            } else {
+                it
+            }
+        }
+        val valueRange = ValueRange().setValues(listOf(rowListFilled))
+        sheetsService
+            .spreadsheets()
+            .values()
+            .update(spreadsheetId, "Data!1:1", valueRange)
+            .setValueInputOption("RAW")
+            .execute()
+    }
+
+
     fun appendData(spreadsheetId: String?, orderData: Map<String, String>) {
         val valuesRead = if (spreadsheetId != null) {
-            readValues(spreadsheetId)
+            readValues(spreadsheetId).first().map { it.toString() }
         } else {
             emptyList()
         }
+        spreadsheetId?.let { if (valuesRead.contains("")) fillEmptyColumns(it, valuesRead) }
         val columnsInOrderData = orderData.keys.toList()
         if (spreadsheetId == null || valuesRead.isEmpty()) {
             val spreadsheetIdToAppend = spreadsheetId ?: createTable(createTitle())
@@ -47,12 +66,11 @@ class GoogleApiTestMachine() {
             appendValues(spreadsheetIdToAppend, rowsValuesColumns)
             appendValues(spreadsheetIdToAppend, rowsValuesData)
         } else {
-            val readResponseRowValues = valuesRead.first().map { it.toString() }
-            val columnsToAdd = columnsInOrderData.filterNot { readResponseRowValues.contains(it) }
+            val columnsToAdd = columnsInOrderData.filterNot { valuesRead.contains(it) }
             val responseRowValues = if (columnsToAdd.isNotEmpty()) {
-                addColumns(columnsToAdd, readResponseRowValues, spreadsheetId)
+                addColumns(columnsToAdd, valuesRead, spreadsheetId)
             } else {
-                readResponseRowValues
+                valuesRead
             }
             val rowsToAdd = createRowsToAdd(orderData, responseRowValues)
             appendValues(spreadsheetId, rowsToAdd)
