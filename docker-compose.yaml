@@ -1,0 +1,15 @@
+version: "2.4"
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/testDB/dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 60s
+      retries: 5

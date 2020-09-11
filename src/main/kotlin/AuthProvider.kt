@@ -7,15 +7,13 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.sheets.v4.SheetsScopes
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
+import java.util.*
 
 object AuthProvider {
     const val APPLICATION_NAME = "Google Sheets API Java Quickstart"
     val JSON_FACTORY = JacksonFactory.getDefaultInstance()
-    const val TOKENS_DIRECTORY_PATH = "tokens"
+  //  const val TOKENS_DIRECTORY_PATH = "tokens"
 
     private val SCOPES = listOf(
         SheetsScopes.SPREADSHEETS,
@@ -23,19 +21,23 @@ object AuthProvider {
         SheetsScopes.DRIVE_FILE
     )
 
-    private const val CREDENTIALS_FILE_PATH = "/credentials.json"
-
     @Throws(IOException::class)
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential {
-        val input =
-            AuthProvider::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH)
-                ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
+        val googleRepository = GoogleRepository()
+        val prop = Properties()
+       AuthProvider::class.java.classLoader.getResourceAsStream("config.properties").use{
+           if (it==null) println("No configs found")
+           prop.load(it)
+       }
+        val input =prop.getProperty("serviceCredentials") ?: throw FileNotFoundException("Resource not found")
         val clientSecrets =
-            GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(input))
+            GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(ByteArrayInputStream(input.toByteArray())))
         val flow = GoogleAuthorizationCodeFlow.Builder(
             HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES
         )
-            .setDataStoreFactory(FileDataStoreFactory(File(TOKENS_DIRECTORY_PATH)))
+            .setDataStoreFactory(GoogleDataStoreFactory(googleRepository))
+          //  .setDataStoreFactory(FileDataStoreFactory(File(TOKENS_DIRECTORY_PATH)))
+          //  .setCredentialCreatedListener(CredentilaCreatedListenerImpl())
             .setAccessType("offline")
             .build()
         val receiver = LocalServerReceiver.Builder().setPort(8888).build()

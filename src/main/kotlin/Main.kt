@@ -1,4 +1,12 @@
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
+
 fun main() {
+    Database.connect(DatabaseModule.createDBConection())
+    transaction{
+        SchemaUtils.create(GoogleCredentisls)
+    }
     val testDataBuilder = DataBuilder()
     val apiTestMachine = GoogleApiTestMachine()
 
